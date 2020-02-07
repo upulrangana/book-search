@@ -1,1 +1,4 @@
-nltk
+Whoosh
+titlecase
+# tkinter==8.6.9
+
