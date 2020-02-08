@@ -3,6 +3,10 @@ from whoosh.fields import Schema, TEXT, ID
 from whoosh import index, highlight
 import os.path
 from whoosh.qparser import QueryParser
+
+from listbox_class import MultiListbox
+
+
 def clicked():
     def search(string1):
         if not os.path.exists("indexdir"):
@@ -27,17 +31,30 @@ def clicked():
             results.fragmenter = highlight.PinpointFragmenter()
             results.formatter = highlight.UppercaseFormatter()
             # results.fragmenter.charlimit = 1000000
-            listbox = Listbox(window)
-            listbox.pack(expand=1, fill="both")
+            # listbox = Listbox(window)
+            # listbox.pack(expand=1, fill="both")
+            Label(window, text='Search Result').pack()
+            mlb = MultiListbox(window, (('Rank', 5), ('Score', 18), ('Result', 80)))
             for hit in results:
-                print(hit["title"])
-                # Assume "content" field is stored
-                print(hit.highlights("content"))
-                i=hit.highlights("content")
-                listbox.insert(END,i)
+                #     print(hit["title"])
+                match_string = hit.highlights("content")
+                mlb.insert(END,
+                           (hit.rank + 1,
+                            str(hit.score), match_string))
+            mlb.pack(expand=YES, fill=BOTH)
+
+            #     # Assume "content" field is stored
+            #     print(hit.highlights("content"))
+            #     # print(hit.docnum)
+            #     print('rank')
+            #     print(hit.rank)
+            #     print('score')
+            #     print(hit.score)
+            #
+            #     i= 'rank = ' + str(hit.rank + 1) + "      score" + str(hit.score) + "\n" + str(match_string)
+            #     listbox.insert(END,i)
             # listbox.config(FIRST)
     search(e.get())
-
 window = Tk()
 window.configure(background="blue")
 window.title("BOOK SEACH ")
@@ -45,8 +62,10 @@ window.geometry('650x600')
 lbl = Label(window, text="SEARCH BOX", background="green")
 lbl.pack(fill=BOTH)
 e = Entry(window)
-e.pack()
+e.pack(fill=BOTH, padx=120, pady=20)
 btn = Button(window, text="Search", command=clicked)
 btn.pack(fill=BOTH, padx=40, pady=20)
+
+# w.mainloop(  )
 window.mainloop()
 
