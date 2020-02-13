@@ -1,6 +1,6 @@
 from tkinter import *
 
-import apply as apply
+from apply import *
 
 
 class MultiListbox(Frame):
@@ -8,7 +8,7 @@ class MultiListbox(Frame):
         Frame.__init__(self, master)
         self.lists = []
         for l, w in lists:
-            frame = Frame(self);
+            frame = Frame(self)
             frame.pack(side=LEFT, expand=YES, fill=BOTH)
             Label(frame, text=l, borderwidth=1, relief=RAISED).pack(fill=X)
             lb = Listbox(frame, width=w, borderwidth=0, selectborderwidth=0,
@@ -54,7 +54,7 @@ class MultiListbox(Frame):
 
     def clear(self):
         for l in self.lists:
-            l.delete(0, LAST)
+            l.delete(0, END)
 
     def get(self, first, last=None):
         result = []
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     mlb = MultiListbox(tk, (('Subject', 40), ('Sender', 20), ('Date', 10)))
     for i in range(1000):
         mlb.insert(END,
-                   ('Important \nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn Message: %d' % i, 'John Doe',
+                   ('Important Message: %d' % i, 'John Doe',
                     '10/10/%04d' % (1900 + i)))
     mlb.pack(expand=YES, fill=BOTH)
     tk.mainloop()
