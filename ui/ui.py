@@ -33,14 +33,28 @@ search_label.grid(row=0, column=0, sticky='e')
 search_entry = Entry(search_frame)
 search_entry.focus()
 search_entry.grid(row=0, column=1, sticky='we')
-search_button = Button(search_frame, text='Search!')
-search_button.grid(row=0, column=2, sticky='w')
+search_button = Button(search_frame, text='  Search!  ')
+search_button.grid(row=0, column=2, sticky='w', padx=20)
 # list frame
-list_frame = Frame(body_frame, bg='yellow')
+list_frame = Frame(body_frame)
 list_frame.grid(row=1, column=0, sticky='wens')
+list_frame.grid_columnconfigure(0, weight=1)
+list_frame.grid_rowconfigure(0, weight=1)
 # sample
-b = Button(list_frame, text="muhaha")
-b.pack()
+canvas = Canvas(list_frame, bg="Black")
 
+canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
+canvas.grid(column=0, row=0, sticky='news')
+lst = []
+yy = 0
+for i in range(1, 100):
+    frame = Frame(canvas, bg='red', borderwidth=1)
+    label = Label(frame, text="File number " + str(i), font=("Courier", 16), compound=RIGHT)
+    label.pack()
+    canvas.create_window(0, yy, window=frame, anchor=NW)
+    yy += 60
+scrollbar = Scrollbar(canvas, orient=VERTICAL, command=canvas.yview)
+scrollbar.place(relx=1, rely=0, relheight=1, anchor=NE)
+canvas.config(yscrollcommand=scrollbar.set, scrollregion=(0, 0, 0, yy))
 # MAIN LOOP
 window.mainloop()
