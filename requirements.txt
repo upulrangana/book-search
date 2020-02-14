@@ -1,3 +1,7 @@
 Whoosh
 titlecase
 apply
+nltk
+sklearn
+pandas
+numpy
