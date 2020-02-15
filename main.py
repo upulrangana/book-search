@@ -4,6 +4,8 @@ from core.search_engine import search_book
 book = Book('./data/book.txt', min_paragraph_length=50)
 
 print('Starting up')
-results = search_book('same sex marriage', book)
-for r in results:
-    print(r.body)
+query = 'same sex marriage'
+results = search_book(query, book)
+print(f'===== Search results for "{query}" =====')
+for i, r in enumerate(results):
+    print(f'({i + 1})\n{r.body[: 500]}...')
