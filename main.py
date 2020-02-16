@@ -1,11 +1,11 @@
 from core.paragraph_parser import Book
-from core.search_engine import search_book
+from ui import MainApp
 
 book = Book('./data/book.txt', min_paragraph_length=50)
 
-print('Starting up')
-query = 'same sex marriage'
-results = search_book(query, book)
-print(f'===== Search results for "{query}" =====')
-for i, r in enumerate(results):
-    print(f'({i + 1})\n{r.body[: 500]}...')
+# results = book.search('same sex marriage')
+# for i, r in enumerate(results):
+#     print(f'({i + 1})\n{r.body[: 500]}...')
+
+app = MainApp(book)
+app.mainloop()

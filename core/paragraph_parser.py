@@ -1,5 +1,7 @@
 import pandas as pd
 
+from core.search_engine import search_book
+
 
 class Book:
     def __init__(self, filepath, separator='\n', min_paragraph_length=50):
@@ -55,3 +57,6 @@ class Book:
                 continue
             paras.append(p)
         return pd.DataFrame({'body': paras})
+
+    def search(self, query):
+        return search_book(query, self)
