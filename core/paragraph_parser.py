@@ -13,14 +13,16 @@ class Book:
         except AttributeError:
             # No, so fall back to the xreadlines module's implementation
             raise IOError("File reading error occurred")
-
-        self.line_num = 0  # current index into self.seq (line number)
-        self.para_num = 0  # current index into self (paragraph number)
-
+        self.reset(self)
         # Ensure that separator string includes a line-end character at the end
         if separator[-1:] != '\n':
             separator += '\n'
         self.separator = separator
+
+    @staticmethod
+    def reset(self):
+        self.line_num = 0  # current index into self.seq (line number)
+        self.para_num = 0  # current index into self (paragraph number)
 
     def __getitem__(self, index):
         if index != self.para_num:
@@ -50,6 +52,7 @@ class Book:
         return ''.join(result).replace('  ', ' ')
 
     def get_dataframe(self):
+        self.reset(self)
         paras = []
         for p in self:
             # filter small paragraphs
@@ -59,4 +62,5 @@ class Book:
         return pd.DataFrame({'body': paras})
 
     def search(self, query):
+        self.reset(self)
         return search_book(query, self)

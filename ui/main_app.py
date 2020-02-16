@@ -4,6 +4,7 @@ from tkinter import *
 class MainApp(Tk):
     def __init__(self, book):
         super(MainApp, self).__init__()
+        self.book = book
         self.setup()
         self.top_frame = TopFrame(self)
         self.body_frame = BodyFrame(self)
@@ -49,13 +50,14 @@ class BodyFrame(Frame):
 class SearchFrame(Frame):
     def __init__(self, parent):
         super(SearchFrame, self).__init__(master=parent)
+        self.book = self.master.master.book
         self.setup()
         self.search_label = Label(self, text="Enter Your Query: ", bg=self['bg'])
         self.search_label.grid(row=0, column=0, sticky='e')
         self.search_entry = Entry(self)
         self.search_entry.focus()
         self.search_entry.grid(row=0, column=1, sticky='we')
-        self.search_button = Button(self, text='  Search!  ')
+        self.search_button = Button(self, text='Search', padx=10, command=self.on_search)
         self.search_button.grid(row=0, column=2, sticky='w', padx=20)
 
     def setup(self):
@@ -64,6 +66,13 @@ class SearchFrame(Frame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=1)
+
+    def on_search(self):
+        query = self.search_entry.get().strip()
+        if query == '':
+            return
+        results = self.book.search(query)
+        self.master.list_frame.update_results(results)
 
 
 class ListFrame(Frame):
@@ -74,11 +83,22 @@ class ListFrame(Frame):
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
         self.canvas.grid(column=0, row=0, sticky='news')
-        pointer_y = 0
-        item_height = 80
         self.master.update()
         self.canvas_width = self.master.winfo_width()
-        for i in range(1, 10):
+        self.scrollbar = Scrollbar(self.canvas, orient=VERTICAL, command=self.canvas.yview)
+        self.scrollbar.place(relx=1, rely=0, relheight=1, anchor=NE)
+        self.build_items(self, [])
+
+    def update_results(self, result):
+        print(result)
+        self.build_items(self, result)
+
+    @staticmethod
+    def build_items(self, results):
+        item_height = 80
+        pointer_y = 0
+        self.canvas.delete('all')
+        for i, result in enumerate(results):
             self.item_frame = Frame(self.canvas, bg='#eee', borderwidth=1, cursor="hand2")
             self.item_frame.grid_columnconfigure(0, )
             self.item_frame.grid_columnconfigure(1, weight=1)
@@ -86,22 +106,19 @@ class ListFrame(Frame):
             self.index_text = Text(self.item_frame, width=10, font=('Arial', 12), relief="flat",
                                    bg=self.item_frame['bg'], cursor="hand2")
             self.index_text.tag_configure('tag-center', justify='center')
-            self.index_text.insert(END, f'#{i}', 'tag-center')
+            self.index_text.insert(END, f'#{i + 1}', 'tag-center')
             self.index_text.config(state=DISABLED)
             self.index_text.grid(column=0, row=0, sticky='we')
             # body text
             self.body_text = Text(self.item_frame, font=('Arial', 12), relief="flat", bg=self.item_frame['bg'],
                                   cursor="hand2")
-            self.body_text.insert(END,
-                                  'The fact that the two individuals went to the police station together after an allegedly brutal attack by the husband, and the fact that the wife continued to cook for the husband and he paid for some household expenses, were interpreted as ‘cohabitation’ and that the marriage had not been ‘deserted’. Therefore, the contextual realities and contradictions that play out in marital relationships, do not find a place in the law.')
+            self.body_text.insert(END, result.body)
             self.body_text.config(state=DISABLED)
             self.body_text.grid(column=1, row=0, sticky='we', padx=5, pady=5)
             self.canvas.create_window(0, pointer_y, window=self.item_frame, width=self.canvas_width - 25,
                                       height=item_height - 5, anchor=NW)
             self.item_frame.columnconfigure(0, weight=1)
             pointer_y += item_height
-        self.scrollbar = Scrollbar(self.canvas, orient=VERTICAL, command=self.canvas.yview)
-        self.scrollbar.place(relx=1, rely=0, relheight=1, anchor=NE)
         self.canvas.config(yscrollcommand=self.scrollbar.set, scrollregion=(0, 0, 0, pointer_y))
 
     def setup(self):
