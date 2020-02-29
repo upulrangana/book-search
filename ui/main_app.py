@@ -12,8 +12,8 @@ class MainApp(Tk):
     def setup(self):
         self.title('The Law and Economics of Marriage and Divorce')
         self.configure(bg='white')
-        self.minsize(0, 500)
-        self.resizable(0, 0)
+        self.minsize(1280, 720)
+        # self.resizable(0, 0)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
@@ -55,6 +55,7 @@ class SearchFrame(Frame):
         self.search_label = Label(self, text="Enter Your Query: ", bg=self['bg'])
         self.search_label.grid(row=0, column=0, sticky='e')
         self.search_entry = Entry(self)
+        self.search_entry.bind('<Return>', self.on_enter)
         self.search_entry.focus()
         self.search_entry.grid(row=0, column=1, sticky='we')
         self.search_button = Button(self, text='Search', padx=10, command=self.on_search)
@@ -73,6 +74,9 @@ class SearchFrame(Frame):
             return
         results = self.book.search(query)
         self.master.list_frame.update_results(results)
+
+    def on_enter(self, event=None):
+        self.on_search()
 
 
 class ListFrame(Frame):
@@ -95,7 +99,7 @@ class ListFrame(Frame):
 
     @staticmethod
     def build_items(self, results):
-        item_height = 80
+        item_height = 150
         pointer_y = 0
         self.canvas.delete('all')
         for i, result in enumerate(results):
@@ -106,7 +110,7 @@ class ListFrame(Frame):
             self.index_text = Text(self.item_frame, width=10, font=('Arial', 12), relief="flat",
                                    bg=self.item_frame['bg'], cursor="hand2")
             self.index_text.tag_configure('tag-center', justify='center')
-            self.index_text.insert(END, f'#{i + 1}', 'tag-center')
+            self.index_text.insert(END, f'#{i + 1}\nscore:\n{round(result.score, 4): }', 'tag-center')
             self.index_text.config(state=DISABLED)
             self.index_text.grid(column=0, row=0, sticky='we')
             # body text
@@ -117,7 +121,7 @@ class ListFrame(Frame):
             self.body_text.grid(column=1, row=0, sticky='we', padx=5, pady=5)
             self.canvas.create_window(0, pointer_y, window=self.item_frame, width=self.canvas_width - 25,
                                       height=item_height - 5, anchor=NW)
-            self.item_frame.columnconfigure(0, weight=1)
+            # self.item_frame.columnconfigure(0, weight=1)
             pointer_y += item_height
         self.canvas.config(yscrollcommand=self.scrollbar.set, scrollregion=(0, 0, 0, pointer_y))
 
